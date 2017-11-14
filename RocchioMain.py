@@ -1,4 +1,5 @@
 import Rocchio2
+import numpy as np
 table = Rocchio2.Rocchio()
 
 # get document name  
@@ -61,8 +62,8 @@ with open('HW4_M10615103.txt','w') as W:
         W.write("\n")
         W.write(query)
         W.write(",")
-        #print(query)
-        for doc,value in table.new_score_dic[query]:
+        #print(query) 
+        for doc,value in table.new_sims[query]:
             W.write(doc)
             W.write(" ")
 '''
