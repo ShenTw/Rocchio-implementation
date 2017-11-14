@@ -15,7 +15,7 @@ import sys
 import os
 import numpy as np
 import math
-class TfIdf:
+class Rocchio:
     def __init__(self):
         self.weighted = False
         self.a = 0.7
@@ -23,10 +23,11 @@ class TfIdf:
         self.PRMax = 100
         self.PR = 0
         self.new_score_dic={}
-        self.doc_vec = {} # doc : vec
+        self.doc_vec = {} # doc : np.array
         self.documents = {} #doc : list of words
         self.corpus_dict = {} # word : times
         self.sims = {} # q : (doc , value)
+        self.new_sims={}
     def add_document(self, doc_name, list_of_words):
         # building a dictionary : {doc:{字:字數}}
         doc_dict = {} # building a dic : {字:字數}
@@ -58,6 +59,7 @@ list of words.
             query_dict[k] = 1+ query_dict[k] / length #got TF
 
         # computing the list of similarities
+        print("computing the list of simi...")
         scoreDic = {}
         for doc in self.documents:
             #每一篇文件要做的事情
@@ -97,21 +99,27 @@ list of words.
             scoreDic[doc]=score
         
         #4.    
-        self.sims[queryName] = sorted(scoreDic.items(), key=lambda item:item[1], reverse = True)
-        #做排序    
-        new_query=[]
-        doc_vector = []
+        print("ranking...")
+        self.sims[queryName] = sorted(scoreDic.items(), key=lambda item:item[1], reverse = True)#做排序    
         #5 query expand 
-        for doc in self.sims[queryName]:
-            if self.PR <self.PRMax:
-                if self.PR==0:
-                    doc_vector = doc[self.PR]
-                    self.PR++1
-                else:
-                    doc_vector = doc_vector + doc[self.PR]
+        print("query expanding....")
+        for index in range(0,self.PRMax,+1): # from sims dictionary, get top 100 doc name
+            if index <self.PRMax:
+                if index==0: # the first one component
+                    doc = self.sims[queryName][index][0] # sims : {queryName:[(doc,sims),(doc,sims)...]}
+                    doc_vector = self.doc_vec[doc]
+                else: # others , sum all top100 the vectors
+                    doc = self.sims[queryName][index][0] # sims : {queryName:[(doc,sims),(doc,sims)...]}
+                    doc_vector = doc_vector + self.doc_vec[doc]
         new_query = self.a * arrayQuery + self.b*(doc_vector/self.PRMax) # get new query
         # do new dot product
-        for doc in self.doc_vect:
-            new_score = new_query.dot(self.doc_vect[doc])/(lengthDoc * lengthQuery)
+        print("new dot product ...")
+        new_query_length = (sum(new_query**2))**0.5 #compute new_query (np.array) length
+        for doc in self.doc_vec:
+            new_doc_length = (sum(self.doc_vec[doc]**2))**0.5 # compute self.doc_vec[doc] ->np.array length
+            new_score = new_query.dot(self.doc_vec[doc])/(new_doc_length * new_query_length)
             self.new_score_dic[doc]= new_score 
+        # rankking
+        print("new ranking...")
+        self.new_sims[queryName] = sorted(self.new_score_dic.items(),key=lambda item:item[1], reverse = True)
         

@@ -2,11 +2,11 @@ import Rocchio2
 table = Rocchio2.Rocchio()
 
 # get document name  
-with open('doc_list.txt','r' ) as L:
+with open("C:/ProgramData/Anaconda3/hw4/doc_list.txt",'r' ) as L:
     
     for line0 in L: # open each document
         line0 = line0.strip('\n')
-        path = "C:/Users/shen/AppData/Local/Programs/Python/Python36-32/Document/"
+        path = "C:/ProgramData/Anaconda3/hw4/Document/"
         file = path+line0
         # open each document
         with open(file,'r') as f:
@@ -31,11 +31,11 @@ with open('doc_list.txt','r' ) as L:
   #          numpy.array([for word in result])
             
 
-with open('query_list.txt','r') as Q:
+with open("C:/ProgramData/Anaconda3/hw4/query_list.txt",'r') as Q:
 
     for line0 in Q:
         line0 = line0.strip('\n')
-        path = "C:/Users/shen/AppData/Local/Programs/Python/Python36-32/Query/"
+        path = "C:/ProgramData/Anaconda3/hw4/Query/"
         file = path+line0
         with open(file,'r') as f:
             
@@ -54,13 +54,25 @@ with open('query_list.txt','r') as Q:
 
    
 count =0
+#output sumbmission file
+with open('HW4_M10615103.txt','w') as W:
+    W.write("Query,RetrievedDocuments")
+    for query in table.new_score_dic:
+        W.write("\n")
+        W.write(query)
+        W.write(",")
+        #print(query)
+        for doc,value in table.new_score_dic[query]:
+            W.write(doc)
+            W.write(" ")
+'''
 for doc in table.sims['20002.query']:
     if count<13:
         print("result is : ", doc)
         count=count+1
     else:
         break
-
+'''
 #print("result is : \n",table.sims['20002.query'])          
 #print ("table is : ",table.corpus_dict)
             # total times
